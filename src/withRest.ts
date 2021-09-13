@@ -1,8 +1,22 @@
-import Boom from '@hapi/boom';
-import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
-import { defaultLogError, defaultSendError } from './utils/error';
+import Boom from "@hapi/boom";
+import { NextApiRequest, NextApiResponse } from "next";
+import { defaultLogError, defaultSendError } from "./utils/error";
+type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> &
+  U[keyof U];
 
-export type RequestTypes = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+export type RequestTypes = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+
+export type Config = Partial<{
+  logError: (err: Boom.Boom<any>) => void;
+  sendError: typeof defaultSendError;
+}>;
+
+export type Handler<T = any> = (
+  req: NextApiRequest,
+  res: NextApiResponse<T>
+) => T | Promise<T>;
+
+export type Handlers = AtLeastOne<Record<RequestTypes, Handler>>;
 
 /**
  * Matches handlers defined in `methods` against the HTTP method, like `GET` or `POST`.
@@ -24,13 +38,7 @@ export type RequestTypes = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
  *   },
  * });
  */
-const withRest = (
-  handlers: Record<RequestTypes, NextApiHandler>,
-  options?: Partial<{
-    logError: (err: Boom.Boom<any>) => void;
-    sendError: typeof defaultSendError;
-  }>
-) => {
+const withRest = (handlers: Handlers, options?: Config) => {
   const config = {
     logError: defaultLogError,
     sendError: defaultSendError,
@@ -39,6 +47,7 @@ const withRest = (
 
   return async (req: NextApiRequest, res: NextApiResponse) => {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const handler = handlers && handlers[req.method! as RequestTypes];
 
       if (!handler) {
@@ -54,7 +63,7 @@ const withRest = (
         if (json !== undefined) {
           config.logError(
             Boom.internal(
-              'You have sent the response inside your handler but still returned something. This error was not sent to the client, however you should probably not return a value in the handler.'
+              "You have sent the response inside your handler but still returned something. This error was not sent to the client, however you should probably not return a value in the handler."
             )
           );
         }
@@ -64,15 +73,16 @@ const withRest = (
 
       // Next.js doesn't support nulls as `RFC7159` dictates, but we do
       if (json === null) {
-        res.setHeader('Content-Type', 'application/json; charset=utf-8');
-        res.setHeader('Content-Length', '4');
-        res.end('null');
+        res.setHeader("Content-Type", "application/json; charset=utf-8");
+        res.setHeader("Content-Length", "4");
+        res.end("null");
       } else {
         res.json(json);
       }
     } catch (err) {
       // Not an ApiError? Then wrap it into an ApiError and log it.
       if (!err.isBoom) {
+        // eslint-disable-next-line no-ex-assign
         err = Boom.internal(undefined, { originalError: err });
       }
 

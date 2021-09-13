@@ -1,5 +1,5 @@
-import { Boom } from '@hapi/boom';
-import { NextApiResponse } from 'next';
+import { Boom } from "@hapi/boom";
+import { NextApiResponse } from "next";
 
 export const defaultLogError = (err: Boom<any>) => {
   // Only log internal server errors
@@ -27,10 +27,7 @@ export const defaultLogError = (err: Boom<any>) => {
  * @param {Error} err - The Boom error object.
  */
 
-export const defaultSendError = (
-  res: NextApiResponse,
-  err: { output: any }
-) => {
+export const defaultSendError = (res: NextApiResponse, err: Boom<any>) => {
   const { output } = err;
   const { headers, statusCode, payload } = output;
 

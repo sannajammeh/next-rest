@@ -1,72 +1,248 @@
-# Typescript Library Starter
+# Boosted | Next Rest
 
-![NPM](https://img.shields.io/npm/l/@gjuchault/typescript-library-starter)
-![NPM](https://img.shields.io/npm/v/@gjuchault/typescript-library-starter)
-![GitHub Workflow Status](https://github.com/gjuchault/typescript-library-starter/actions/workflows/typescript-library-starter.yml/badge.svg?branch=main)
+![NPM](https://img.shields.io/npm/l/@boostedts/next-rest)
+![NPM](https://img.shields.io/npm/v/@boostedts/next-rest)
+![GitHub Workflow Status](https://github.com/sannajammeh/next-rest/actions/workflows/next-rest.yml/badge.svg?branch=master)
 
-Yet another (opinionated) typescript library starter template.
+## Motivation
 
-## Opinions and limitations
+This is a a full TS implementation of [`Moxy´s Next Rest Api`](https://github.com/moxystudio/next-rest-api)
 
-1. Relies as much as possible on each included library's defaults
-2. Only rely on GitHub Actions
-3. Do not include documentation generation
+Next.js brought API routes support in v9, but you have to provide your own implementation for handling different HTTP methods, validation, error handling and so on. So in short, this library provides a standard way to:
 
-## Getting started
+- Detect HTTP methods (GET, POST, PUT, PATCH, DELETE, etc).
+- Validate the request (headers, query, body).
+- Handle errors, including how their responses look like.
+- Log errors, by printing them to `stderr` by default.
 
-1. `git clone git@github.com:gjuchault/typescript-library-starter.git my-project`
-2. `cd my-project`
-3. `yarn` or `npm install`
-4. `yarn setup` or `npm run setup`
+## Installation
 
-## Features
+<!-- ```sh
+$ npm install @moxy/next-rest-api joi @hapi/boom
+``` -->
 
-### Node.js, npm and/or yarn version
+```sh
+npm i @boostedts/next-rest
+```
 
-Typescript Library Starter relies on [volta](https://volta.sh/) to ensure node version to be consistent across developers. It's also used in the GitHub workflow file.
+Or
 
-### Typescript
+```sh
+yarn add @boostedts/next-rest
+```
 
-Leverages [esbuild](https://github.com/evanw/esbuild) for blazing fast builds, but keeps `tsc` to generate `.d.ts` files.
-Generates two builds to support both ESM and CJS.
+This library has a peer-dependency on [`joi`](https://github.com/sideway/joi) and [`@hapi/boom`](https://github.com/hapijs/boom) to perform validation and to output errors in a standard format.
 
-Commands:
+## Usage
 
-- `build`: runs typechecking then generates CJS, ESM and `d.ts` files in the `build/` directory
-- `clean`: removes the `build/` directory
-- `type:dts`: only generates `d.ts`
-- `type:check`: only run typechecking
-- `type:build`: only generates CJS and ESM
+### Simple get endpoint:
 
-### Tests
+In `/pages/api/products.js` (or `/pages/api/products/index.js`)
 
-typescript-library-starter uses [ava](https://github.com/avajs/ava) and [esbuild-register](https://github.com/egoist/esbuild-register) so that there is no need to compile before the tests start running. The coverage is done through [nyc](https://github.com/istanbuljs/nyc).
+```js
+import withRest from "@moxy/next-rest-api";
 
-Commands:
+export default withRest({
+  GET: async (req, res) => {
+    const products = await listProducts();
 
-- `test`: runs ava test runner
-- `test:coverage`: runs ava test runner and generates coverage reports
+    // You may do some post-processing of `products` here...
 
-### Format & lint
+    return products;
+  },
+});
+```
 
-This template relies on the combination of [eslint](https://github.com/eslint/eslint) — through [typescript-eslint](https://github.com/typescript-eslint/typescript-eslint) for linting and [prettier](https://github.com/prettier/prettier) for formatting.
-It also uses [cspell](https://github.com/streetsidesoftware/cspell) to ensure spelling
+### Simple get & post endpoint, with validation:
 
-Commands:
+In `/pages/api/products.js` (or `/pages/api/products/index.js`)
 
-- `format`: runs prettier with automatic fixing
-- `format:check`: runs prettier without automatic fixing (used in CI)
-- `lint`: runs eslint with automatic fixing
-- `lint:check`: runs eslint without automatic fixing (used in CI)
-- `spell:check`: runs spellchecking
+```js
+import withRest, { withValidation } from "@moxy/next-rest-api";
+import Joi from "joi";
+import Boom from "@hapi/boom";
 
-### Releasing
+const getSchema = {
+  query: Joi.object({
+    q: Joi.string(),
+    sortBy: Joi.valid("price:asc", "price:desc"),
+  }),
+};
 
-Under the hood, this library uses [semantic-release](https://github.com/semantic-release/semantic-release) and [commitizen](https://github.com/commitizen/cz-cli).
-The goal is to avoid manual release process. Using `semantic-release` will automatically create a github release (hence tags) as well as an npm release.
-Based on your commit history, `semantic-release` will automatically create a patch, feature or breaking release.
+const postSchema = {
+  body: Joi.object({
+    name: Joi.string().max(200).required(),
+    description: Joi.string().max(2000),
+    price: Joi.number().min(0).required(),
+  }),
+};
 
-Commands:
+export default withRest({
+  GET: withValidation(getSchema)(async (req, res) => {
+    const products = await listProducts(req.query);
 
-- `cz`: interactive CLI that helps you generate a proper git commit message, using [commitizen](https://github.com/commitizen/cz-cli)
-- `semantic-release`: triggers a release (used in CI)
+    return products;
+  }),
+  POST: withValidation(postSchema)(async (req, res) => {
+    const product = await createProduct(req.body);
+
+    return product;
+  }),
+});
+```
+
+ℹ️ You may use [`p-compose`](https://github.com/JasonPollman/p-compose) to compose your "middlewares" to be more readable, like so:
+
+```js
+import withRest, { withValidation } from "@moxy/next-rest-api";
+import compose from "p-compose";
+
+export default withRest({
+  GET: compose(withValidation(getSchema), async (req, res) => {
+    const products = await listProducts(req.query);
+
+    return products;
+  }),
+});
+```
+
+### Simple get, put and delete endpoints, with validation:
+
+In `/pages/api/products/[id].js`
+
+ℹ️ In Next.js, dynamic parameters are assigned to the request query (`req.query.id` in this case).
+
+```js
+import withRest, { withValidation } from '@moxy/next-rest-api';
+import Joi from 'joi';
+import Boom from '@hapi/boom';
+
+const getSchema = {
+    query: Joi.object({
+        id: Joi.string().required(),
+    }),
+};
+
+const putSchema = {
+    query: getSchema.query,
+    body: Joi.object({
+        name: Joi.string().max(200).required(),
+        description: Joi.string().max(2000),
+        price: Joi.number().min(0).required(),
+    }),
+};
+
+const deleteSchema = {
+    query: getSchema.query,
+};
+
+export default withRest({
+    GET: withValidation(getSchema)(async (req, res) => {
+        let product;
+
+        try {
+            product = await getProduct(req.query.id);
+        } catch (err) {
+            if (err.code === 'NOT_FOUND') {
+                throw Boom.notFound(`Product with id ${req.query.id} does not exist`);
+            }
+
+            throw err;
+        }
+
+        return product;
+    }),
+    PUT: withValidation(putSchema)(async (req, res) => {
+        let product;
+
+        try {
+            product = await updateProduct(req.query.id, req.body);
+        } catch (err) {
+            if (err.code === 'NOT_FOUND') {
+                throw Boom.notFound(`Product with id ${req.query.id} does not exist`);
+            }
+
+            throw err;
+        }
+
+        return product;
+    }),
+    DELETE: withValidation(deleteSchema)(async (req, res) => {
+        try {
+            product = await deleteProduct(req.query.id);
+        } catch (err) {
+            if (err.code === 'NOT_FOUND') {
+                return;
+            }
+
+            throw err;
+        }
+    },
+});
+```
+
+ℹ️ A lot of schemas in the above examples are being repeated. To keep things DRY, it's advisable to reuse them, perhaps in a `schemas.js` file.
+
+## API
+
+### withRest(methods, [options])
+
+Matches handlers defined in `methods` against the HTTP method, like `GET` or `POST`.
+
+Handlers may return any valid JSON as per the [RFC7159](https://tools.ietf.org/html/rfc7159), which includes objects, arrays, booleans and null (undefined is coerced to null). The return value will be sent automatically as a JSON response.
+
+Exceptions thrown within handlers will be caught automatically and sent to the client. You may either throw a [Boom](https://github.com/hapijs/boom) error or a standard error object. If a standard error object is thrown, it will be converted to a Boom error instance automatically (`500`).
+
+In case you throw a Boom error, you may optionally pass the original error inside [`data.originalError`](https://github.com/hapijs/boom/blob/master/API.md#boombadrequestmessage-data), making the default error logger print that error instead of the Boom wrapper (when within the `5xx` range). In fact, this is already done automatically for you when you throw a standard error object inside handlers.
+
+Here's an example on how to pass the original error:
+
+```js
+try {
+  await deleteProduct(req.query.id);
+} catch (err) {
+  throw Boom.internal("Unable to delete product", { originalError: err });
+}
+```
+
+#### methods
+
+Type: `object`
+
+An object mapping HTTP methods to their handlers with the following signature: `async (req, res) => {}`.
+
+#### options
+
+Type: `object`
+
+##### sendError
+
+Type: `function`  
+Default: _see `defaultSendError` in [index.js](index.js)_
+
+A function responsible to send Boom errors back to the client. Has the following signature: `(res, err) => {}`.
+
+The default implementation uses the `output` property of the Boom error to set the response headers, status code and payload.
+
+##### logError
+
+Type: `function`  
+Default: _see `defaultLogError` in [index.js](index.js)_
+
+A function that logs errors. Has the following signature: `(err) => {}`.
+
+The default implementation ignores any non `5xx` and simply prints the error stack to `stderr`. If the error contains `data.originalError`, that error's stack is printed instead.
+
+### withValidation(schemas)
+
+Wraps a handler with validation against [Joi](https://github.com/hapijs/joi) schemas.
+
+If validation fails, a `400 Bad Request` response will be sent back to the client.
+
+#### schemas
+
+Type: `object`
+
+An object with `query`, `body` or `headers` keys and their associated Joi schemas. Each of these schemas will be matched against the incoming request.
+
+⚠️ Generally you only want to validate a subset of headers. In such situations, your `headers` schema should allow unknown keys with `.unknown(true)`.

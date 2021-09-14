@@ -27,9 +27,6 @@ jobs:
       - name: Lint check
         run: yarn lint:check
 
-      - name: Spell check
-        run: yarn spell:check
-
       - name: Test
         run: yarn test
 

@@ -61,7 +61,8 @@
     "sinon": "^11.1.2",
     "sinon-chai": "^3.7.0",
     "source-map-support": "^0.5.20",
-    "typescript": "^4.4.3"
+    "typescript": "^4.4.3",
+    "sinon-express-mock": "^2.2.1"
   },
   "volta": {
     "node": "16.4.1",
@@ -71,8 +72,5 @@
   "peerDependencies": {
     "@hapi/boom": "^9.1.4",
     "joi": "^17.4.2"
-  },
-  "dependencies": {
-    "sinon-express-mock": "^2.2.1"
   }
 }

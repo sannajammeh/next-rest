@@ -1,7 +1,6 @@
 # Boosted | Next Rest
 
-![NPM](https://img.shields.io/npm/l/@boostedts/next-rest)
-![NPM](https://img.shields.io/npm/v/@boostedts/next-rest)
+[![NPM](https://img.shields.io/npm/v/@boostedts/next-rest)](https://www.npmjs.com/package/@boostedts/next-rest)
 ![GitHub Workflow Status](https://github.com/sannajammeh/next-rest/actions/workflows/next-rest.yml/badge.svg?branch=master)
 
 ## Motivation

@@ -16,17 +16,10 @@ export type Handler<T = any> = (
   res: NextApiResponse<T>
 ) => T | Promise<T>;
 
-export type Handlers = AtLeastOne<Record<RequestTypes, Handler>>;
+export type Handlers<T> = AtLeastOne<Record<RequestTypes, Handler<T>>>;
 
 /**
  * Matches handlers defined in `methods` against the HTTP method, like `GET` or `POST`.
- *
- * @param {object.<string, Function>} handlers - An object mapping HTTP methods to their handlers.
- * @param {object} options - The options.
- * @param {SendError} options.sendError - A function responsible to send Boom errors back to the client.
- * @param {LogError} options.logError - A function that logs errors.
- *
- * @returns {Function} The composed HTTP handler.
  *
  * @example
  *
@@ -38,14 +31,14 @@ export type Handlers = AtLeastOne<Record<RequestTypes, Handler>>;
  *   },
  * });
  */
-const withRest = (handlers: Handlers, options?: Config) => {
+const withRest = <T = any>(handlers: Handlers<T>, options?: Config) => {
   const config = {
     logError: defaultLogError,
     sendError: defaultSendError,
     ...options,
   };
 
-  return async (req: NextApiRequest, res: NextApiResponse) => {
+  return async (req: NextApiRequest, res: NextApiResponse<T>) => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const handler = handlers && handlers[req.method! as RequestTypes];

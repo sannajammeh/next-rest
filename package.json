@@ -8,6 +8,11 @@
   "engines": {
     "node": "> 14"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sannajammeh/next-rest.git"
+  },
+  "homepage": "https://github.com/sannajammeh/next-rest",
   "publishConfig": {
     "access": "public"
   },

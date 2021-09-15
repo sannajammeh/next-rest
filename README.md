@@ -1,11 +1,11 @@
 # Boosted | Next Rest
 
-[![NPM](https://img.shields.io/npm/v/@boostedts/next-rest)](https://www.npmjs.com/package/@boostedts/next-rest)
+![NPM](https://img.shields.io/npm/v/@boostedts/next-rest)
 ![GitHub Workflow Status](https://github.com/sannajammeh/next-rest/actions/workflows/next-rest.yml/badge.svg?branch=master)
 
 ## Motivation
 
-This is a a full TS implementation of [`Moxy´s Next Rest Api`](https://github.com/moxystudio/next-rest-api)
+This is a a full TS implementation of [`Moxy´s Next Rest Api`](https://github.com/moxystudio/next-rest)
 
 Next.js brought API routes support in v9, but you have to provide your own implementation for handling different HTTP methods, validation, error handling and so on. So in short, this library provides a standard way to:
 
@@ -17,7 +17,7 @@ Next.js brought API routes support in v9, but you have to provide your own imple
 ## Installation
 
 <!-- ```sh
-$ npm install @moxy/next-rest-api joi @hapi/boom
+$ npm install @boostedts/next-rest joi @hapi/boom
 ``` -->
 
 ```sh
@@ -39,7 +39,7 @@ This library has a peer-dependency on [`joi`](https://github.com/sideway/joi) an
 In `/pages/api/products.js` (or `/pages/api/products/index.js`)
 
 ```js
-import withRest from "@moxy/next-rest-api";
+import withRest from "@boostedts/next-rest";
 
 export default withRest({
   GET: async (req, res) => {
@@ -57,7 +57,7 @@ export default withRest({
 In `/pages/api/products.js` (or `/pages/api/products/index.js`)
 
 ```js
-import withRest, { withValidation } from "@moxy/next-rest-api";
+import withRest, { withValidation } from "@boostedts/next-rest";
 import Joi from "joi";
 import Boom from "@hapi/boom";
 
@@ -93,7 +93,7 @@ export default withRest({
 ℹ️ You may use [`p-compose`](https://github.com/JasonPollman/p-compose) to compose your "middlewares" to be more readable, like so:
 
 ```js
-import withRest, { withValidation } from "@moxy/next-rest-api";
+import withRest, { withValidation } from "@boostedts/next-rest";
 import compose from "p-compose";
 
 export default withRest({
@@ -112,7 +112,7 @@ In `/pages/api/products/[id].js`
 ℹ️ In Next.js, dynamic parameters are assigned to the request query (`req.query.id` in this case).
 
 ```js
-import withRest, { withValidation } from '@moxy/next-rest-api';
+import withRest, { withValidation } from '@boostedts/next-rest';
 import Joi from 'joi';
 import Boom from '@hapi/boom';
 

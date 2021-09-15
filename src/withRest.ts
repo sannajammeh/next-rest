@@ -1,22 +1,7 @@
 import Boom from "@hapi/boom";
 import { NextApiRequest, NextApiResponse } from "next";
+import { WithRestConfig, Handlers, RequestTypes } from "./types";
 import { defaultLogError, defaultSendError } from "./utils/error";
-type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> &
-  U[keyof U];
-
-export type RequestTypes = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-
-export type Config = Partial<{
-  logError: (err: Boom.Boom<any>) => void;
-  sendError: typeof defaultSendError;
-}>;
-
-export type Handler<T = any> = (
-  req: NextApiRequest,
-  res: NextApiResponse<T>
-) => T | Promise<T>;
-
-export type Handlers<T> = AtLeastOne<Record<RequestTypes, Handler<T>>>;
 
 /**
  * Matches handlers defined in `methods` against the HTTP method, like `GET` or `POST`.
@@ -31,14 +16,17 @@ export type Handlers<T> = AtLeastOne<Record<RequestTypes, Handler<T>>>;
  *   },
  * });
  */
-const withRest = <T = any>(handlers: Handlers<T>, options?: Config) => {
+const withRest = <Body = any, Response = any>(
+  handlers: Handlers<Body, Response>,
+  options?: WithRestConfig
+) => {
   const config = {
     logError: defaultLogError,
     sendError: defaultSendError,
     ...options,
   };
 
-  return async (req: NextApiRequest, res: NextApiResponse<T>) => {
+  return async (req: NextApiRequest, res: NextApiResponse<Response>) => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const handler = handlers && handlers[req.method! as RequestTypes];

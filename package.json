@@ -30,7 +30,6 @@
   },
   "devDependencies": {
     "@esbuild-plugins/node-resolve": "^0.1.4",
-    "@hapi/boom": "^9.1.4",
     "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/commit-analyzer": "^8.0.1",
     "@semantic-release/github": "^7.2.3",
@@ -49,27 +48,27 @@
     "cspell": "^5.9.0",
     "cz-conventional-changelog": "^3.3.0",
     "esbuild": "^0.12.26",
+    "esbuild-plugin-glob": "^1.0.1",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-import": "^2.24.2",
-    "joi": "^17.4.2",
     "next": "^11.1.2",
     "nyc": "^15.1.0",
     "prettier": "^2.4.0",
     "semantic-release": "^17.4.7",
     "sinon": "^11.1.2",
     "sinon-chai": "^3.7.0",
+    "sinon-express-mock": "^2.2.1",
     "source-map-support": "^0.5.20",
-    "typescript": "^4.4.3",
-    "sinon-express-mock": "^2.2.1"
+    "typescript": "^4.4.3"
   },
   "volta": {
     "node": "16.4.1",
     "yarn": "1.22.10",
     "npm": "7.19.1"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@hapi/boom": "^9.1.4",
     "joi": "^17.4.2"
   }

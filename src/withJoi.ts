@@ -1,6 +1,7 @@
 import Boom from "@hapi/boom";
 import Joi from "joi";
 import { NextApiRequest, NextApiResponse } from "next";
+import { Handler } from "./types";
 
 /**
  * Wraps a HTTP request handler with validation against Joi schemas.
@@ -27,9 +28,11 @@ import { NextApiRequest, NextApiResponse } from "next";
  * });
  */
 
-export const withValidation =
-  (schemas: Joi.PartialSchemaMap<any> | undefined) =>
-  (fn: (arg0: NextApiRequest, arg1: NextApiResponse<any>) => any) =>
+export const withJoi =
+  <Body = any, Response = any>(
+    schemas: Joi.PartialSchemaMap<any> | undefined
+  ) =>
+  (fn: Handler<Body, Response>) =>
   async (req: NextApiRequest, res: NextApiResponse) => {
     const joiSchema = Joi.object(schemas).unknown(true);
 

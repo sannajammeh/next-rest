@@ -5,7 +5,7 @@ import withRest from "../index";
 import chai, { expect } from "chai";
 import sinonChai from "sinon-chai";
 import Joi from "joi";
-import { withValidation } from "../withValidation";
+import { withJoi } from "../withJoi";
 import { match } from "sinon";
 chai.use(sinonChai);
 
@@ -29,7 +29,7 @@ test("withRest() with POST request passing", async (t) => {
   };
 
   const handler = withRest({
-    POST: withValidation(postSchema)(() => {
+    POST: withJoi(postSchema)(() => {
       return payload;
     }),
   });
@@ -58,7 +58,7 @@ test("withRest() with invalid POST body", async (t) => {
   };
 
   const handler = withRest({
-    POST: withValidation(postSchema)(() => {
+    POST: withJoi(postSchema)(() => {
       return payload;
     }),
   });

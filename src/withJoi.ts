@@ -28,7 +28,7 @@ import { Handler } from "./types";
  * });
  */
 
-export const withJoi =
+const withJoi =
   <Body = any, Response = any>(
     schemas: Joi.PartialSchemaMap<any> | undefined
   ) =>
@@ -51,3 +51,5 @@ export const withJoi =
 
     return fn(req, res);
   };
+
+export default withJoi;

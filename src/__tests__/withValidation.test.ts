@@ -5,7 +5,7 @@ import withRest from "../index";
 import chai, { expect } from "chai";
 import sinonChai from "sinon-chai";
 import Joi from "joi";
-import { withJoi } from "../withJoi";
+import withJoi from "../withJoi";
 import { match } from "sinon";
 chai.use(sinonChai);
 

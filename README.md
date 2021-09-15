@@ -57,7 +57,8 @@ export default withRest({
 In `/pages/api/products.js` (or `/pages/api/products/index.js`)
 
 ```js
-import withRest, { withValidation } from "@boostedts/next-rest";
+import withRest from "@boostedts/next-rest";
+import withJoi from "@boostedts/next-rest/withJoi";
 import Joi from "joi";
 import Boom from "@hapi/boom";
 
@@ -77,12 +78,12 @@ const postSchema = {
 };
 
 export default withRest({
-  GET: withValidation(getSchema)(async (req, res) => {
+  GET: withJoi(getSchema)(async (req, res) => {
     const products = await listProducts(req.query);
 
     return products;
   }),
-  POST: withValidation(postSchema)(async (req, res) => {
+  POST: withJoi(postSchema)(async (req, res) => {
     const product = await createProduct(req.body);
 
     return product;
@@ -93,11 +94,12 @@ export default withRest({
 ℹ️ You may use [`p-compose`](https://github.com/JasonPollman/p-compose) to compose your "middlewares" to be more readable, like so:
 
 ```js
-import withRest, { withValidation } from "@boostedts/next-rest";
+import withRest from "@boostedts/next-rest";
+import withJoi from "@boostedts/next-rest/withJoi";
 import compose from "p-compose";
 
 export default withRest({
-  GET: compose(withValidation(getSchema), async (req, res) => {
+  GET: compose(withJoi(getSchema), async (req, res) => {
     const products = await listProducts(req.query);
 
     return products;
@@ -112,7 +114,8 @@ In `/pages/api/products/[id].js`
 ℹ️ In Next.js, dynamic parameters are assigned to the request query (`req.query.id` in this case).
 
 ```js
-import withRest, { withValidation } from '@boostedts/next-rest';
+import withRest from '@boostedts/next-rest';
+import withJoi from "@boostedts/next-rest/withJoi";
 import Joi from 'joi';
 import Boom from '@hapi/boom';
 
@@ -136,7 +139,7 @@ const deleteSchema = {
 };
 
 export default withRest({
-    GET: withValidation(getSchema)(async (req, res) => {
+    GET: withJoi(getSchema)(async (req, res) => {
         let product;
 
         try {
@@ -151,7 +154,7 @@ export default withRest({
 
         return product;
     }),
-    PUT: withValidation(putSchema)(async (req, res) => {
+    PUT: withJoi(putSchema)(async (req, res) => {
         let product;
 
         try {
@@ -166,7 +169,7 @@ export default withRest({
 
         return product;
     }),
-    DELETE: withValidation(deleteSchema)(async (req, res) => {
+    DELETE: withJoi(deleteSchema)(async (req, res) => {
         try {
             product = await deleteProduct(req.query.id);
         } catch (err) {

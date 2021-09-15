@@ -57,8 +57,7 @@ export default withRest({
 In `/pages/api/products.js` (or `/pages/api/products/index.js`)
 
 ```js
-import withRest from "@boostedts/next-rest";
-import withJoi from "@boostedts/next-rest/withJoi";
+import withRest, { withJoi } from "@boostedts/next-rest";
 import Joi from "joi";
 import Boom from "@hapi/boom";
 
@@ -94,8 +93,7 @@ export default withRest({
 ℹ️ You may use [`p-compose`](https://github.com/JasonPollman/p-compose) to compose your "middlewares" to be more readable, like so:
 
 ```js
-import withRest from "@boostedts/next-rest";
-import withJoi from "@boostedts/next-rest/withJoi";
+import withRest, { withJoi } from "@boostedts/next-rest";
 import compose from "p-compose";
 
 export default withRest({
@@ -114,8 +112,7 @@ In `/pages/api/products/[id].js`
 ℹ️ In Next.js, dynamic parameters are assigned to the request query (`req.query.id` in this case).
 
 ```js
-import withRest from '@boostedts/next-rest';
-import withJoi from "@boostedts/next-rest/withJoi";
+import withRest, { withJoi } from '@boostedts/next-rest';
 import Joi from 'joi';
 import Boom from '@hapi/boom';
 
@@ -235,7 +232,7 @@ A function that logs errors. Has the following signature: `(err) => {}`.
 
 The default implementation ignores any non `5xx` and simply prints the error stack to `stderr`. If the error contains `data.originalError`, that error's stack is printed instead.
 
-### withValidation(schemas)
+### withJoi(schemas)
 
 Wraps a handler with validation against [Joi](https://github.com/hapijs/joi) schemas.
 

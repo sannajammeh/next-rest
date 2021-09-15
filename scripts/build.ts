@@ -43,7 +43,6 @@ async function main() {
     format: "esm",
     outdir: path.join(__dirname, "../build/esm"),
     entryPoints: [path.join(__dirname, "../src/**/*.ts")],
-    bundle: false,
     plugins: [
       globPlugin(),
       NodeResolve({
